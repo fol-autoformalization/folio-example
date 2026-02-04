@@ -1,0 +1,49 @@
+// FOLIO "educational" FOL grammar
+start: formula ["."]
+
+// Formulas with precedence (lowest to highest)
+formula: biconditional
+
+biconditional: implication (("↔" | "⟷") implication)*
+
+implication: disjunction (("→" | "—>") disjunction)*
+
+disjunction: xor (("∨" xor)+)?
+
+xor: conjunction (("⊕" conjunction)+)?
+
+conjunction: negation (("∧" negation)+)?
+
+negation: "¬" negation
+        | atom
+
+atom: quantified
+    | predicate
+    | "(" formula ")"
+    | equality
+
+// Quantifiers (can appear anywhere an atom can)
+quantified: "∀" VARIABLE+ formula
+          | "∃" VARIABLE+ formula
+
+// Predicates and functions: any identifier followed by parentheses
+predicate: IDENTIFIER "(" [term ("," term)* [","]] ")"
+
+// Terms: variables, constants, numbers, or function applications
+term: VARIABLE
+    | IDENTIFIER "(" [term ("," term)* [","]] ")"  // function application
+    | IDENTIFIER  // constant
+    | NUMBER
+
+// Equality and inequality
+equality: term "=" term
+        | term "≠" term
+        | "¬" "(" term "=" term ")"
+
+// Lexical tokens
+VARIABLE: /[a-z]/
+NUMBER: /[0-9]+(\.[0-9]+)?/
+IDENTIFIER: /[a-zA-Z0-9éèêîôûàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿśŚąęłńźżα-ωА-я][a-zA-Z0-9_.\-!'éèêîôûàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿśŚąęłńźżα-ωА-я]*/
+
+%import common.WS
+%ignore WS
